@@ -9,13 +9,15 @@
 class MyTask
 {
     private:
-	void *data;
+	int _data;
     public:
+	MyTask(int data):_data(data){}
+	void SetData(int data){_data = data;}
 	void Run()
 	{   
 	    srand(time(NULL));
 	    int s = rand() % 5;
-	    printf("thread %p get data %s sleep -- %d\n",pthread_self(),data,s);
+	    printf("thread %p get data %d sleep -- %d\n",pthread_self(),_data,s);
 	    sleep(s);
 	}
 };
@@ -30,11 +32,42 @@ class ThreadPool
 	pthread_cond_t _empty;
 
 	int _max_thr;
+
+	bool QueueIsEmpty()
+	{
+	    return (_list.size() == 0);
+	}
+	bool QueueIsFull()
+	{
+	    return (_list.size() == _cap);
+	}
+	bool QueuePush(MyTask *t)
+	{
+	    _list.push(t);
+	}
+	void QueuePop(MyTask **t)
+	{
+	    *t = _list.front();
+	    _list.pop();
+	}
 	static void *thr_start(void *arg)
 	{
-	    ThreadPool *p = (ThreadPool*)arg;
-	    pthread_mutex_lock(&p->_mutex);
-	    pthread_mutex_unlock(&p->_mutex);
+	    while(1)
+	    {
+		ThreadPool *p = (ThreadPool*)arg;
+		pthread_mutex_lock(&p->_mutex);
+		MyTask *task;
+		while(p->QueueIsEmpty())
+		{
+		    //没有任务，则工作线程陷入等待
+		    pthread_cond_wait(&p->_empty,&p->_mutex);
+		}
+		p->QueuePop(&task);
+		pthread_mutex_unlock(&p->_mutex);
+		pthread_cond_signal(&p->_full);
+		task->Run();
+		delete task;
+	    }
 	    return NULL;   
 	}
     public:
@@ -71,13 +104,28 @@ class ThreadPool
 	bool AddTask(MyTask *task)
 	{
 	    pthread_mutex_lock(&_mutex);
-	    // QueuePush(task);
+	    while(QueueIsFull())
+	    {
+		pthread_cond_wait(&_full,&_mutex);
+	    }
+	    QueuePush(task);
 	    pthread_mutex_unlock(&_mutex);
+	    pthread_cond_signal(&_empty);
 	    return true;
 	}
 };
 
 int main()
 {
+    ThreadPool p;
+    p.Init();
+    MyTask *t;
+    int i = 0;
+    while(1)
+    {
+	printf("add task data:%d\n",i);
+	t = new MyTask(i++);
+	p.AddTask(t);
+    }
     return 0;
 }
