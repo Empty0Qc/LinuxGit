@@ -3,7 +3,7 @@
 #include <iostream>
 #include <pthread.h>
 #include "ProtocolUtil.hpp"
-
+#include "UserManager.hpp"
 class ChatServer;
 class Param{
 public:
@@ -25,6 +25,8 @@ class ChatServer{
 	
 	int udp_work_sock;
 	int udp_port;
+	
+	UserManager um;
    public:
 	ChatServer(int tcp_port_ = 8080, int udp_port_ = 8888)
 		:tcp_port(tcp_port_),

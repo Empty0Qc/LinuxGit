@@ -7,7 +7,7 @@ LDFLAGS=-lpthread
 all:$(server) $(client)
 
 $(server):ChatServer.cc
-	$(cc) -o $@ $^ $(LDFLAGS)
+	$(cc) -o -std=c++11 $@ $^ $(LDFLAGS)
 $(client):ChatClient.cc
 	$(cc) -o $@ $^
 

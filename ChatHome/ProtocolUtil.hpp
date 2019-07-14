@@ -13,6 +13,38 @@
 
 #define BACKLOG 5
 
+
+
+class Util{
+	struct bool RegisterEnter(std::string &n_,std::string &s_, std::string &passwd)
+	{
+		std::cout << "Please Enter Nick Name : ";
+		std::cin >> nick_name;
+		std::cout << "Please Enter School : ";
+		std::cin >> school;
+		std::cout << "Please Enter Passwd: ";
+		std::cin >> passwd;
+		std::string again;
+		std::cout << "Please Enter Passwd Again: ";
+		if(passwd == again)	
+		{
+			return true;
+		}
+		return false;
+	}
+};
+
+
+class Request{
+	public:
+	    std::string method; //REGISTER, LOGIN, LOGOUT
+	    std::string content_lenth; //"Content-Length: 89"
+	    std::string blank;
+	    std::string text;
+	public:
+	    Request():blank('\n'){}
+	    ~Request() {}
+};
 class SocketApi{
 public:
     	static int Socket(int type)
@@ -73,4 +105,17 @@ public:
 		return true;
 	}
 
+	static void Send(int sock, Request &rq)
+	{
+		std::string &m_ = rq.method;
+		std::string &cl_ = rq.content_length;
+		std::string &t_ = rq.text;
+		std::string &b_ = rq.blank;
+		send(sock, m_.c_str(),m_.size(),0);
+		send(sock, cl_.c_str(),cl_.size(),0);
+		send(sock, b_.c_str(),b_.size(),0);
+		send(sock, t_.c_str(),t_.size(),0);
+	}
+
 };
+
