@@ -40,10 +40,17 @@ class ChatClient{
 		{
 			Request rq;
 			rq.method = "REGISTER\n";
-			rq.content_length = "Content-Length ";
-			rq.text = ;
+			
+      Json::Value root;
+      root["name"] = nick_name;
+      root["school"] = school;
+      root["passwd"] = passwd;
 
-			SockApi::Send(tcp_sock, rq);
+		  Util::Seralizer(root, rq.text);
+      rq.content_length = "Content-Length: ";
+      rq.content_length += Util::IntToString((rq.text).size());
+      rq.content_length += "\n";
+			SocketApi::Send(tcp_sock, rq);
 
 
 		}

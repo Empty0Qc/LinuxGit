@@ -8,7 +8,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <netinet/in.h>
-
+#include "json/json.h"
 #include "Log.hpp"
 
 #define BACKLOG 5
@@ -16,12 +16,12 @@
 
 
 class Util{
-	struct bool RegisterEnter(std::string &n_,std::string &s_, std::string &passwd)
+	static bool RegisterEnter(std::string &n_,std::string &s_, std::string &passwd)
 	{
 		std::cout << "Please Enter Nick Name : ";
-		std::cin >> nick_name;
+		std::cin >> n_;
 		std::cout << "Please Enter School : ";
-		std::cin >> school;
+		std::cin >> s_;
 		std::cout << "Please Enter Passwd: ";
 		std::cin >> passwd;
 		std::string again;
@@ -32,17 +32,29 @@ class Util{
 		}
 		return false;
 	}
+  static void Seralizer(Json::Value &root,std::string outString)
+  {
+    Json::FastWriter w;
+    outString = w.write(root);
+  }
+  static void UnSeralizer(std::string &inString,Json::Value &root)
+  {
+    Json::Reader r;
+    r.parse(inString, root, false);
+  }
 };
 
 
 class Request{
 	public:
 	    std::string method; //REGISTER, LOGIN, LOGOUT
-	    std::string content_lenth; //"Content-Length: 89"
+	    std::string content_length; //"Content-Length: 89"
 	    std::string blank;
 	    std::string text;
 	public:
-	    Request():blank('\n'){}
+	    Request()
+        :blank('\n')
+      {}
 	    ~Request() {}
 };
 class SocketApi{
@@ -105,7 +117,7 @@ public:
 		return true;
 	}
 
-	static void Send(int sock, Request &rq)
+	static void Send(int sock,Request &rq)
 	{
 		std::string &m_ = rq.method;
 		std::string &cl_ = rq.content_length;

@@ -19,16 +19,16 @@ public:
 };
 
 class ChatServer{
-    private:
-	int tcp_listen_sock;
-        int tcp_port;
+  private:
+	  int tcp_listen_sock;
+    int tcp_port;
 	
-	int udp_work_sock;
-	int udp_port;
+	  int udp_work_sock;
+	  int udp_port;
 	
-	UserManager um;
-   public:
-	ChatServer(int tcp_port_ = 8080, int udp_port_ = 8888)
+	  UserManager um;
+    public:
+	  ChatServer(int tcp_port_ = 8080, int udp_port_ = 8888)
 		:tcp_port(tcp_port_),
 		 tcp_listen_sock(-1),
 		 udp_port(udp_port_),
@@ -47,7 +47,7 @@ class ChatServer{
 		
 	}
 
-	static void *HandlerRequest(void *arg)
+  static void *HandlerRequest(void *arg)
 	{
 		Param *p = (Param*)arg;
 		int sock = p->sock;
